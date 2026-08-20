@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Fast&amp;Curious</string>
+    <string name="title_activity_main">Fast&amp;Curious</string>
+    <string name="package_name">com.fastandcurious.app</string>
+    <string name="custom_url_scheme">com.fastandcurious.app</string>
+</resources>
