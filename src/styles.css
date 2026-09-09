@@ -1,6 +1,7 @@
 :root {
   --color-background: #000000;
   --color-primary: #00ff5e;
+  --color-opposite: #d4004e;
 
   --color-text: #ffffff;
   --color-text-green: #00ff5e;
@@ -38,4 +39,15 @@ app-root {
   height: 100dvh;
 
   overflow: hidden;
+}
+
+/* Le composant routé est inséré juste après router-outlet. */
+router-outlet + * {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
 }

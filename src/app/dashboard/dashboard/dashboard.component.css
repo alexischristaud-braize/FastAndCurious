@@ -1,0 +1,274 @@
+
+/* =================================
+   DASHBOARD
+================================= */
+
+:host {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+}
+
+.dashboard {
+  flex: 1 1 0;
+
+  width: 100%;
+  min-height: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden;
+}
+
+
+/* =================================
+   COMPTEUR PRINCIPAL
+================================= */
+
+.compteur {
+  flex: 0 0 40%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+}
+
+.speed-value {
+  font-size: clamp(4.5rem, 22vw, 10rem);
+
+  font-weight: 900;
+
+  line-height: 0.8;
+
+  letter-spacing: -5px;
+}
+
+.speed-unit {
+  margin-top: 6px;
+
+  font-size: 0.8rem;
+  font-weight: bold;
+
+  color: var(--color-text-green);
+
+  letter-spacing: 2px;
+}
+
+.speed-label {
+  margin-top: 4px;
+
+  font-size: 0.6rem;
+
+  color: var(--color-text-secondary);
+
+  letter-spacing: 2px;
+}
+
+
+/* =================================
+   ZONE DES MÉTRIQUES
+================================= */
+
+.metriques {
+  flex: 1 1 0;
+
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+
+  overflow: hidden;
+}
+
+
+/* =================================
+   GRILLE AUTO-ADAPTATIVE
+================================= */
+
+.metric-grid {
+  display: grid;
+
+  width: 100%;
+  height: 100%;
+
+  min-width: 0;
+  min-height: 0;
+
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  /*
+    Chaque nouvelle ligne créée automatiquement
+    partage la hauteur disponible.
+  */
+  grid-auto-rows: minmax(0, 1fr);
+
+  grid-auto-flow: row;
+
+  gap: 7px;
+}
+
+
+/* =================================
+   CARTE MÉTRIQUE
+================================= */
+
+.metric {
+  min-width: 0;
+  min-height: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  justify-content: center;
+
+  padding: 6px 9px;
+
+  overflow: hidden;
+
+  background: var(--color-card);
+
+  border: 1px solid var(--color-border);
+
+  border-radius: 10px;
+}
+
+.metric-label {
+  font-size: clamp(0.55rem, 2vw, 0.7rem);
+
+  color: var(--color-text-secondary);
+
+  text-transform: uppercase;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.stat {
+  margin-top: 3px;
+
+  font-size: clamp(0.9rem, 4vw, 1.25rem);
+
+  font-weight: 700;
+
+  white-space: nowrap;
+}
+
+
+/* =================================
+   BOUTON MÉTRIQUES AVANCÉES
+================================= */
+
+.advanced-toggle {
+  flex: 0 0 auto;
+
+  width: 100%;
+
+  margin-top: 7px;
+
+  padding: 8px;
+
+  border: 1px solid var(--color-border);
+
+  border-radius: 10px;
+
+  background: var(--color-card);
+
+  color: var(--color-text-green);
+
+  font-size: 0.65rem;
+
+  font-weight: 800;
+
+  letter-spacing: 1px;
+
+  cursor: pointer;
+}
+
+.advanced-toggle:active {
+  transform: scale(0.98);
+}
+
+
+/* =================================
+   BOUTON DÉMARRER
+================================= */
+
+.button-container {
+  flex: 0 0 auto;
+
+  margin-top: auto;
+
+  padding: 8px 0;
+}
+
+.start-button {
+  width: 100%;
+
+  padding: 12px;
+
+  background: var(--color-primary);
+
+  color: #000000;
+
+  border: none;
+
+  border-radius: 12px;
+
+  font-size: 0.85rem;
+
+  font-weight: 900;
+
+  letter-spacing: 1px;
+
+  cursor: pointer;
+}
+
+.start-button:active {
+  transform: scale(0.98);
+  background: #ffffff;
+}
+
+.stop-button {
+  background: var(--color-opposite);
+}
+
+
+/* =================================
+   PETITS ÉCRANS EN HAUTEUR
+================================= */
+
+
+@media (max-height: 600px) {
+
+  .compteur {
+    flex-basis: 25%;
+  }
+
+  .speed-value {
+    font-size: 4.5rem;
+  }
+
+  .speed-unit,
+  .speed-label {
+    display: none;
+  }
+
+  .advanced-toggle {
+    padding: 5px;
+  }
+
+  .button-container {
+    padding: 5px 0;
+  }
+
+  .start-button {
+    padding: 8px;
+  }
+}

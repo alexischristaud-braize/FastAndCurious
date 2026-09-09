@@ -1,0 +1,215 @@
+/* =================================
+   DASHBOARD
+================================= */
+
+:host {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+}
+
+/* =================================
+   COMPTEUR PRINCIPAL
+================================= */
+
+.entete {
+  font-weight: 900;
+  margin-top: 10%;
+  text-align: center;
+}
+
+.entete h1 {
+  color: var(--color-text-secondary);
+  margin: 0;
+  padding: 0;
+  font-weight: 900;
+  letter-spacing: 2px;
+}
+
+.select-wrapper {
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.select-measure {
+  display: block;
+  min-width: 0;
+  padding-right: 25px;
+  white-space: nowrap;
+  visibility: hidden;
+}
+
+.select-wrapper::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 1.5em;
+  width: 7px;
+  height: 7px;
+  border-right: 2px solid var(--color-text-green);
+  border-bottom: 2px solid var(--color-text-green);
+  transform: translateY(-65%) rotate(45deg);
+  pointer-events: none;
+}
+
+.periode-select {
+  position: absolute;
+  inset: 0;
+  width: 80%;
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--color-text);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+.periode-select:focus,
+.periode-select:focus-visible {
+  border: none;
+  outline: none;
+  box-shadow: none;
+}
+
+
+.periode-select option {
+  background: var(--color-card);
+  color: var(--color-text);
+}
+
+.speed-value {
+  font-size: clamp(4.5rem, 22vw, 10rem);
+
+  font-weight: 900;
+
+  line-height: 0.8;
+
+  letter-spacing: -5px;
+}
+
+.speed-unit {
+  margin-top: 6px;
+
+  font-size: 0.8rem;
+  font-weight: bold;
+
+  color: var(--color-text-green);
+
+  letter-spacing: 2px;
+}
+
+.speed-label {
+  margin-top: 4px;
+
+  font-size: 0.6rem;
+
+  color: var(--color-text-secondary);
+
+  letter-spacing: 2px;
+}
+
+/* =================================
+   ZONE DES MÉTRIQUES
+================================= */
+
+.metriques {
+  flex: 1 1 0;
+
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+
+  overflow: hidden;
+}
+
+/* =================================
+   GRILLE AUTO-ADAPTATIVE
+================================= */
+
+.trajet-label {
+  font-size: clamp(0.7rem, 2vw, 0.7rem);
+
+  color: var(--color-text-secondary);
+  font-weight: 800;
+  text-transform: uppercase;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.metric-grid {
+  display: grid;
+
+  width: 100%;
+  height: 60%;
+
+  min-width: 0;
+  min-height: 0;
+
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  /*
+    Chaque nouvelle ligne créée automatiquement
+    partage la hauteur disponible.
+  */
+  grid-auto-rows: minmax(0, 1fr);
+
+  grid-auto-flow: row;
+
+  gap: 7px;
+}
+
+/* =================================
+   CARTE MÉTRIQUE
+================================= */
+
+.metric {
+  min-width: 0;
+  min-height: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  justify-content: center;
+
+  padding: 6px 9px;
+
+  overflow: hidden;
+
+  background: var(--color-card);
+
+  border: 1px solid var(--color-border);
+
+  border-radius: 10px;
+}
+
+.metric-label {
+  font-size: clamp(0.55rem, 2vw, 0.7rem);
+
+  color: var(--color-text-secondary);
+
+  text-transform: uppercase;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.stat {
+  margin-top: 3px;
+
+  font-size: clamp(0.9rem, 4vw, 1.25rem);
+
+  font-weight: 700;
+
+  white-space: nowrap;
+}

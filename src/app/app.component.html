@@ -5,127 +5,10 @@
     <span class="logo-fast">FAST</span>
     <span class="logo-and">&</span>
     <span class="logo-curious">CURIOUS</span>
+    <span *ngIf="dataUpdated" class="logo-curious" style="color: grey">save</span>
   </header>
 
-
-  <!-- DASHBOARD -->
-  <main class="dashboard">
-
-    <!-- COMPTEUR PRINCIPAL -->
-    <section class="compteur">
-
-      <div class="speed-value">0</div>
-
-      <div class="speed-unit">
-        KM/H
-      </div>
-
-      <div class="speed-label">
-        VITESSE ACTUELLE
-      </div>
-
-    </section>
-
-
-    <!-- MÉTRIQUES -->
-    <section class="metriques" [class.advanced]="showAdvancedMetrics">
-
-      <div class="metric-grid">
-
-        <!-- MÉTRIQUES TOUJOURS VISIBLES -->
-
-        <div class="metric">
-          <span class="metric-label">Vitesse moyenne</span>
-          <span class="stat">0.0 km/h</span>
-        </div>
-
-        <div class="metric">
-          <span class="metric-label">Vitesse max</span>
-          <span class="stat">0.0 km/h</span>
-        </div>
-
-        <div class="metric">
-          <span class="metric-label">Temps écoulé</span>
-          <span class="stat">00:00:00</span>
-        </div>
-
-        <div class="metric">
-          <span class="metric-label">Distance</span>
-          <span class="stat">0 km</span>
-        </div>
-
-        <!-- MÉTRIQUES AVANCÉES -->
-
-
-        <div class="metric" *ngIf="showAdvancedMetrics">
-          <span class="metric-label">G latéral</span>
-          <span class="stat">0.00 G</span>
-        </div>
-
-        <div class="metric" *ngIf="showAdvancedMetrics">
-          <span class="metric-label">Temps d'arrêt</span>
-          <span class="stat">00:00:00</span>
-        </div>
-
-        <div class="metric" *ngIf="showAdvancedMetrics">
-
-          <span class="metric-label">0 → 50 km/h</span>
-          <span class="stat">--.-- s</span>
-
-        </div>
-
-        <div class="metric" *ngIf="showAdvancedMetrics">
-
-          <span class="metric-label">0 → 100 km/h</span>
-          <span class="stat">--.-- s</span>
-
-        </div>
-
-        <div class="metric" *ngIf="showAdvancedMetrics">
-
-          <span class="metric-label">Accélération max</span>
-          <span class="stat">0.00 G</span>
-
-        </div>
-
-        <div class="metric" *ngIf="showAdvancedMetrics">
-
-          <span class="metric-label">Freinage max</span>
-          <span class="stat">0.00 G</span>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- BOUTON BASCULE MÉTRIQUES -->
-
-    <button class="advanced-toggle" type="button" (click)="toggleAdvancedMetrics()">
-
-      {{
-      showAdvancedMetrics
-      ? '▲ MOINS DE MÉTRIQUES'
-      : '▼ MÉTRIQUES AVANCÉES'
-      }}
-
-    </button>
-
-
-    <!-- BOUTON DÉMARRER -->
-
-    <section class="button-container">
-
-      <button class="start-button" type="button" (click)="startTrip()">
-
-        DÉMARRER LE TRAJET
-
-      </button>
-
-    </section>
-
-  </main>
+  <router-outlet></router-outlet>
 
 </div>
 
@@ -134,18 +17,22 @@
 
 <footer>
 
-  <button class="nav-button active" type="button">
+  <button class="nav-button" routerLink="dashboard" routerLinkActive="active" type="button">
 
-    <span>●</span>
+    <span>
+      <span class="icon icon-car" aria-hidden="true"></span>
+    </span>
 
-    TRAJET
+    CONDUIRE
 
   </button>
 
+  <button class="nav-button" routerLink="statistiques" routerLinkActive="active" type="button">
 
-  <button class="nav-button" type="button">
+    <span>
+      <span class="icon icon-stat" aria-hidden="true"></span>
 
-    <span>▦</span>
+    </span>
 
     STATISTIQUES
 
