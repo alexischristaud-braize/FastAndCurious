@@ -44,9 +44,7 @@
                 <span class="metric-label">Temps écoulé</span>
 
                 <span class="stat">
-                    {{ metrics.elapsedTime / 3600000 | number:'2.0-0' }}:
-                    {{ (metrics.elapsedTime / 60000) % 60 | number:'2.0-0' }}:
-                    {{ (metrics.elapsedTime / 1000) % 60 | number:'2.0-0' }}
+                    {{ metrics.elapsedTime | date:'HH:mm:ss':'UTC' }}
                 </span>
             </div>
 
