@@ -30,6 +30,11 @@ export class AppComponent implements OnInit {
     maxSpeed: 0,
     averageSpeed: 0,
     elapsedTime: 0,
+    elapsedTimeRace: 0,
+    time50: 0,
+    time100: 0,
+    bestTime50: 0,
+    bestTime100: 0,
     gpsCount: 0,
 
     isTracking: false,

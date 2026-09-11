@@ -30,8 +30,8 @@ export class DatabaseService {
    *
    * Si plusieurs méthodes demandent l'initialisation
    * en même temps, elles attendront toutes la même Promise.
-  *
-  * @returns Une Promise résolue lorsque la connexion et les tables sont prêtes.
+   *
+   * @returns Une Promise résolue lorsque la connexion et les tables sont prêtes.
    */
   async init(): Promise<void> {
     if (this.initPromise) {
@@ -50,8 +50,8 @@ export class DatabaseService {
 
   /**
    * Effectue réellement l'initialisation de la base.
-    *
-    * @returns Une Promise résolue lorsque la base, ses tables et ses préférences sont prêtes.
+   *
+   * @returns Une Promise résolue lorsque la base, ses tables et ses préférences sont prêtes.
    */
   private async initialize(): Promise<void> {
     console.log('[DB] Début initialisation');
@@ -69,7 +69,7 @@ export class DatabaseService {
         false,
         'no-encryption',
         1,
-        false,
+        false
       );
 
       console.log('[DB] Connexion créée');
@@ -99,40 +99,15 @@ export class DatabaseService {
 
   /**
    * Création des tables.
-    *
-    * @returns Une Promise résolue lorsque toutes les tables existent.
+   *
+   * @returns Une Promise résolue lorsque toutes les tables existent.
    */
   private async createTables(): Promise<void> {
+    // await this.db.execute('DROP TABLE IF EXISTS trip_data');
+    // await this.db.execute('DROP TABLE IF EXISTS trip_motion');
+    // await this.db.execute('DROP TABLE IF EXISTS trips');
+
     const query = `
-      CREATE TABLE IF NOT EXISTS trips (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        startedAt INTEGER NOT NULL,
-        endedAt INTEGER,
-        elapsedTime INTEGER DEFAULT 0,
-        distance REAL DEFAULT 0,
-        maxSpeed REAL DEFAULT 0,
-        averageSpeed REAL DEFAULT 0
-      );
-
-      CREATE TABLE IF NOT EXISTS trip_data (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        tripId INTEGER NOT NULL,
-        timestamp INTEGER NOT NULL,
-        speed REAL DEFAULT 0,
-        latitude REAL,
-        longitude REAL,
-        accelerationX REAL DEFAULT 0,
-        accelerationY REAL DEFAULT 0,
-        accelerationZ REAL DEFAULT 0,
-        orientationAlpha REAL DEFAULT 0,
-        orientationBeta REAL DEFAULT 0,
-        orientationGamma REAL DEFAULT 0,
-
-        FOREIGN KEY (tripId)
-          REFERENCES trips(id)
-          ON DELETE CASCADE
-      );
-
       CREATE TABLE IF NOT EXISTS preferences (
         label VARCHAR(50) PRIMARY KEY,
         value INTEGER DEFAULT 0
@@ -145,16 +120,80 @@ export class DatabaseService {
         defaultOrientationBeta REAL DEFAULT 0,
         defaultOrientationGamma REAL DEFAULT 0
       );
+
+      CREATE TABLE IF NOT EXISTS trips (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        startedAt INTEGER NOT NULL,
+        endedAt INTEGER,
+        elapsedTime INTEGER DEFAULT 0,
+        distance REAL DEFAULT 0,
+        maxSpeed REAL DEFAULT 0,
+        averageSpeed REAL DEFAULT 0,
+        parameterId INTEGER DEFAULT NULL,
+
+        FOREIGN KEY (parameterId)
+          REFERENCES parameters(id)
+          ON DELETE CASCADE
+      );
+      
+      CREATE TABLE IF NOT EXISTS trip_data (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        tripId INTEGER NOT NULL,
+        timestamp INTEGER NOT NULL,
+        speed REAL DEFAULT 0,
+        latitude REAL,
+        longitude REAL,
+
+        FOREIGN KEY (tripId)
+          REFERENCES trips(id)
+          ON DELETE CASCADE
+      );
+
+      CREATE TABLE IF NOT EXISTS trip_motion (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        tripId INTEGER NOT NULL,
+        timestamp INTEGER NOT NULL,
+        accelerationX REAL DEFAULT 0,
+        accelerationY REAL DEFAULT 0,
+        accelerationZ REAL DEFAULT 0,
+        orientationAlpha REAL DEFAULT 0,
+        orientationBeta REAL DEFAULT 0,
+        orientationGamma REAL DEFAULT 0,
+
+        FOREIGN KEY (tripId)
+          REFERENCES trips(id)
+          ON DELETE CASCADE
+      );
+
+      
+
     `;
 
     await this.db.execute(query);
+
+    const columns = await this.db.query(`PRAGMA table_info(trips)`);
+    const existingColumns = new Set(
+      (columns.values ?? []).map((column: any) => column.name)
+    );
+
+    if (!existingColumns.has('time50')) {
+      await this.db.execute(
+        'ALTER TABLE trips ADD COLUMN time50 INTEGER DEFAULT 0'
+      );
+    }
+
+    if (!existingColumns.has('time100')) {
+      await this.db.execute(
+        'ALTER TABLE trips ADD COLUMN time100 INTEGER DEFAULT 0'
+      );
+    }
   }
 
   /**
    * Crée un nouveau trajet.
-    *
-    * @param startedAt Horodatage Unix en millisecondes du début du trajet.
-    * @returns L'identifiant numérique du trajet créé.
+   *
+   * @param startedAt Horodatage Unix en millisecondes du début du trajet.
+   * @returns L'identifiant numérique du trajet créé.
    */
   async createTrip(startedAt: number): Promise<number> {
     await this.init();
@@ -164,7 +203,7 @@ export class DatabaseService {
         INSERT INTO trips (startedAt)
         VALUES (?)
       `,
-      [startedAt],
+      [startedAt]
     );
 
     if (result.changes?.lastId === undefined) {
@@ -176,15 +215,12 @@ export class DatabaseService {
 
   /**
    * Ajoute une mesure à un trajet.
-    *
-    * @param tripId Identifiant du trajet auquel rattacher la mesure.
-    * @param metrics Mesures GPS, de vitesse, d'accélération et d'orientation à enregistrer.
-    * @returns L'identifiant numérique de la mesure créée.
+   *
+   * @param tripId Identifiant du trajet auquel rattacher la mesure.
+  * @param metrics Mesures GPS et vitesse à enregistrer.
+   * @returns L'identifiant numérique de la mesure créée.
    */
-  async addTripData(
-    tripId: number,
-    metrics: TripMetrics,
-  ): Promise<number> {
+  async addTripData(tripId: number, metrics: TripMetrics): Promise<number> {
     await this.init();
 
     const result = await this.db.run(
@@ -194,15 +230,9 @@ export class DatabaseService {
           timestamp,
           speed,
           latitude,
-          longitude,
-          accelerationX,
-          accelerationY,
-          accelerationZ,
-          orientationAlpha,
-          orientationBeta,
-          orientationGamma
+          longitude
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?)
       `,
       [
         tripId,
@@ -210,13 +240,7 @@ export class DatabaseService {
         metrics.speed,
         metrics.latitude,
         metrics.longitude,
-        metrics.accelerationX,
-        metrics.accelerationY,
-        metrics.accelerationZ,
-        metrics.orientationAlpha,
-        metrics.orientationBeta,
-        metrics.orientationGamma,
-      ],
+      ]
     );
 
     if (result.changes?.lastId === undefined) {
@@ -228,14 +252,16 @@ export class DatabaseService {
 
   /**
    * Met à jour un trajet terminé.
-    *
-    * @param tripId Identifiant du trajet à mettre à jour.
-    * @param elapsedTime Durée du trajet écoulée, en millisecondes.
-    * @param distance Distance parcourue, en mètres.
-    * @param maxSpeed Vitesse maximale enregistrée.
-    * @param averageSpeed Vitesse moyenne enregistrée.
-    * @param endedAt Horodatage Unix en millisecondes de la fin du trajet.
-    * @returns Une Promise résolue lorsque la mise à jour est enregistrée.
+   *
+   * @param tripId Identifiant du trajet à mettre à jour.
+   * @param elapsedTime Durée du trajet écoulée, en millisecondes.
+   * @param distance Distance parcourue, en mètres.
+   * @param maxSpeed Vitesse maximale enregistrée.
+   * @param averageSpeed Vitesse moyenne enregistrée.
+  * @param time50 Temps jusqu'à 50 km/h, en millisecondes.
+  * @param time100 Temps jusqu'à 100 km/h, en millisecondes.
+   * @param endedAt Horodatage Unix en millisecondes de la fin du trajet.
+   * @returns Une Promise résolue lorsque la mise à jour est enregistrée.
    */
   async updateTrip(
     tripId: number,
@@ -243,7 +269,9 @@ export class DatabaseService {
     distance: number,
     maxSpeed: number,
     averageSpeed: number,
-    endedAt: number,
+    time50: number,
+    time100: number,
+    endedAt: number
   ): Promise<void> {
     await this.init();
 
@@ -253,6 +281,8 @@ export class DatabaseService {
         SET
           endedAt = ?,
           elapsedTime = ?,
+          time50 = ?,
+          time100 = ?,
           distance = ?,
           maxSpeed = ?,
           averageSpeed = ?
@@ -261,18 +291,20 @@ export class DatabaseService {
       [
         endedAt,
         elapsedTime,
+        time50,
+        time100,
         distance,
         maxSpeed,
         averageSpeed,
         tripId,
-      ],
+      ]
     );
   }
 
   /**
    * Récupère tous les trajets.
-    *
-    * @returns Une liste de trajets triés du plus récent au plus ancien.
+   *
+   * @returns Une liste de trajets triés du plus récent au plus ancien.
    */
   async getTrips(): Promise<any[]> {
     await this.init();
@@ -288,9 +320,9 @@ export class DatabaseService {
 
   /**
    * Récupère un trajet.
-    *
-    * @param tripId Identifiant du trajet recherché.
-    * @returns Le trajet trouvé, ou `null` si aucun trajet ne correspond à l'identifiant.
+   *
+   * @param tripId Identifiant du trajet recherché.
+   * @returns Le trajet trouvé, ou `null` si aucun trajet ne correspond à l'identifiant.
    */
   async getTrip(tripId: number): Promise<any | null> {
     await this.init();
@@ -301,19 +333,17 @@ export class DatabaseService {
         FROM trips
         WHERE id = ?
       `,
-      [tripId],
+      [tripId]
     );
 
-    return result.values && result.values.length > 0
-      ? result.values[0]
-      : null;
+    return result.values && result.values.length > 0 ? result.values[0] : null;
   }
 
   /**
    * Récupère toutes les données d'un trajet.
-    *
-    * @param tripId Identifiant du trajet dont les mesures sont demandées.
-    * @returns Les mesures du trajet dans l'ordre chronologique.
+   *
+   * @param tripId Identifiant du trajet dont les mesures sont demandées.
+   * @returns Les mesures du trajet dans l'ordre chronologique.
    */
   async getTripData(tripId: number): Promise<TripMetrics[]> {
     await this.init();
@@ -323,18 +353,12 @@ export class DatabaseService {
         SELECT
           speed,
           latitude,
-          longitude,
-          accelerationX,
-          accelerationY,
-          accelerationZ,
-          orientationAlpha,
-          orientationBeta,
-          orientationGamma
+          longitude
         FROM trip_data
         WHERE tripId = ?
         ORDER BY timestamp ASC
       `,
-      [tripId],
+      [tripId]
     );
 
     return result.values as TripMetrics[];
@@ -342,9 +366,9 @@ export class DatabaseService {
 
   /**
    * Supprime un trajet.
-    *
-    * @param tripId Identifiant du trajet à supprimer.
-    * @returns Une Promise résolue lorsque le trajet et ses données associées sont supprimés.
+   *
+   * @param tripId Identifiant du trajet à supprimer.
+   * @returns Une Promise résolue lorsque le trajet et ses données associées sont supprimés.
    */
   async deleteTrip(tripId: number): Promise<void> {
     await this.init();
@@ -354,15 +378,15 @@ export class DatabaseService {
         DELETE FROM trips
         WHERE id = ?
       `,
-      [tripId],
+      [tripId]
     );
   }
 
   /**
    * Récupère une préférence.
-    *
-    * @param label Nom de la préférence à lire.
-    * @returns `true` si la valeur stockée vaut 1, sinon `false`.
+   *
+   * @param label Nom de la préférence à lire.
+   * @returns `true` si la valeur stockée vaut 1, sinon `false`.
    */
   async getPreference(label: string): Promise<boolean> {
     await this.init();
@@ -375,7 +399,7 @@ export class DatabaseService {
         FROM preferences
         WHERE label = ?
       `,
-      [label],
+      [label]
     );
 
     const toReturn = result.values?.[0]?.value === 1;
@@ -387,15 +411,12 @@ export class DatabaseService {
 
   /**
    * Modifie une préférence.
-    *
-    * @param label Nom de la préférence à modifier.
-    * @param value Valeur numérique à enregistrer, généralement 0 ou 1.
-    * @returns Une Promise résolue lorsque la préférence est enregistrée.
+   *
+   * @param label Nom de la préférence à modifier.
+   * @param value Valeur numérique à enregistrer, généralement 0 ou 1.
+   * @returns Une Promise résolue lorsque la préférence est enregistrée.
    */
-  async updatePreference(
-    label: string,
-    value: number,
-  ): Promise<void> {
+  async updatePreference(label: string, value: number): Promise<void> {
     await this.init();
 
     await this.db.run(
@@ -404,14 +425,14 @@ export class DatabaseService {
         SET value = ?
         WHERE label = ?
       `,
-      [value, label],
+      [value, label]
     );
   }
 
   /**
    * Ferme la base de données.
-    *
-    * @returns Une Promise résolue après la fermeture et la remise à zéro de la connexion.
+   *
+   * @returns Une Promise résolue après la fermeture et la remise à zéro de la connexion.
    */
   async close(): Promise<void> {
     if (!this.db) {

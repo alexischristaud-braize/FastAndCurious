@@ -24,6 +24,11 @@ export class DashboardComponent {
     maxSpeed: 0,
     averageSpeed: 0,
     elapsedTime: 0,
+    elapsedTimeRace: 0,
+    time50: 0,
+    time100: 0,
+    bestTime50: 0,
+    bestTime100: 0,
     gpsCount: 0,
 
     isTracking: false,
@@ -93,15 +98,6 @@ export class DashboardComponent {
    */
   async startTrip(): Promise<void> {
     await this.trip.start();
-    await LocalNotifications.schedule({
-      notifications: [
-        {
-          id: 1,
-          title: 'Début du voyage ! ',
-          body: 'Envoi fesse vite !',
-        },
-      ],
-    });
   }
 
   /**

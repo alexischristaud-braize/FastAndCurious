@@ -6,19 +6,14 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { DashboardComponent } from './dashboard/dashboard/dashboard.component';
 import { StatistiquesComponent } from './stats/statistiques/statistiques.component';
+import { TripListComponent } from './stats/trips/trip-list/trip-list.component';
+import { TripItemComponent } from './stats/trips/trip-item/trip-item.component';
+import { TripDetailsComponent } from './stats/trips/trip-details/trip-details.component';
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    DashboardComponent,
-    StatistiquesComponent
-  ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule
-  ],
+  declarations: [AppComponent, DashboardComponent, StatistiquesComponent, TripListComponent, TripItemComponent, TripDetailsComponent],
+  imports: [BrowserModule, AppRoutingModule],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
-
+export class AppModule {}

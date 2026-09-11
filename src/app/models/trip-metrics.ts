@@ -1,5 +1,4 @@
 export interface TripMetrics {
-
   // =========================
   // ÉTAT DU TRAJET
   // =========================
@@ -11,6 +10,7 @@ export interface TripMetrics {
   // =========================
 
   speed: number;
+
   latitude: number;
   longitude: number;
 
@@ -20,6 +20,7 @@ export interface TripMetrics {
 
   maxSpeed: number;
   averageSpeed: number;
+  
   gpsCount: number;
 
   // =========================
@@ -27,6 +28,12 @@ export interface TripMetrics {
   // =========================
 
   elapsedTime: number;
+
+  elapsedTimeRace: number;
+  time50: number;
+  time100: number;
+  bestTime50: number;
+  bestTime100: number;
 
   // =========================
   // DISTANCE

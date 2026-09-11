@@ -43,7 +43,7 @@ export class GpsService {
     if (Capacitor.isNativePlatform()) {
       this.watchId = await BackgroundGeolocation.addWatcher(
         {
-          backgroundTitle: 'Fast&Curious',
+          backgroundTitle: 'Zig zig zigounette au vent',
           backgroundMessage: 'Enregistrement du trajet en cours.',
           requestPermissions: true,
           stale: false,
