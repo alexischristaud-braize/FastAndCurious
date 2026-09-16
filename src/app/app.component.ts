@@ -1,3 +1,4 @@
+import { App } from '@capacitor/app';
 import { Component, OnInit } from '@angular/core';
 
 import { TripMetrics } from './models/trip-metrics';
@@ -71,6 +72,7 @@ export class AppComponent implements OnInit {
   updateTitle = 'Mise à jour disponible !';
   updateName = '';
   updateVersion = '';
+  actualVersionApp = '';
   actualVersion = '';
   updateDescription = '';
 
@@ -113,6 +115,7 @@ export class AppComponent implements OnInit {
     );
 
     this.actualVersion = await this.databaseService.getConfig('apkVersion');
+    this.actualVersionApp = (await App.getInfo())?.version;
     this.loadRelease();
 
     const permission = await LocalNotifications.requestPermissions();
@@ -200,15 +203,18 @@ export class AppComponent implements OnInit {
       return;
     }
     this.isDownloading = true;
+
     try {
-       await this.updateService.updateApp();
+      const result = await this.updateService.updateApp();
 
-      // L'installation peut être annulée par l'utilisateur sans lever d'erreur.
+      if (result.success === false) {
+        console.log("Installation annulée par l'utilisateur");
+        return;
+      }
 
-      // Exécuté uniquement si le téléchargement et l'installation ont réussi.
-      // this.updateAvailable = false;
+      this.updateAvailable = false;
       this.showUpdatePanel = false;
-      // this.databaseService.updateConfig('apkVersion', this.updateVersion);
+      this.databaseService.updateConfig('apkVersion', this.updateVersion);
     } catch (error) {
       console.error("Impossible d'installer la mise à jour", error);
     } finally {

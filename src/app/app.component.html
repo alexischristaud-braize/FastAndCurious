@@ -10,7 +10,7 @@
     <span class="icon icon-download" aria-hidden="true"></span>
   </button>
 
-  <div class="settings" routerLink="/settings">
+  <div class="settings" routerLink="settings">
     <span class="icon icon-settings" aria-hidden="true"></span>
   </div>
 
@@ -36,7 +36,7 @@
         <p class="update-version">
           {{ this.updateName }}
           <br />
-          Actuel : {{ this.actualVersion }}
+          {{ this.actualVersion }} | {{ this.actualVersionApp }}
         </p>
 
         <div class="update-description" [innerHTML]="updateDescription"></div>

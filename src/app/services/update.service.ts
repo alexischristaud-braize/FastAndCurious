@@ -2,9 +2,14 @@ import { Injectable } from '@angular/core';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { registerPlugin } from '@capacitor/core';
 
+export interface InstallResult {
+  success: boolean;
+  resultCode: number;
+}
+
 const ApkInstaller = registerPlugin<{
   download(options: { url: string }): Promise<{ uri: string }>;
-  install(options: { uri: string }): Promise<void>;
+  install(options: { uri: string }): Promise<InstallResult>;
 }>('ApkInstaller');
 
 export interface GithubRelease {
@@ -43,13 +48,14 @@ export class UpdateService {
     return result.uri;
   }
 
-  async updateApp(): Promise<void> {
+  async updateApp(): Promise<InstallResult> {
     const apkUri = await this.downloadApk();
 
-    const result = await ApkInstaller.install({
-      uri: apkUri,
-    });
-    console.log( "update service update app : " +result);
+    const result = await ApkInstaller.install({ uri: apkUri });
+
+    console.log('update service update app :', result);
+
+    return result;
   }
 
   private blobToBase64(blob: Blob): Promise<string> {

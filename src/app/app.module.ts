@@ -9,9 +9,10 @@ import { StatistiquesComponent } from './stats/statistiques/statistiques.compone
 import { TripListComponent } from './stats/trips/trip-list/trip-list.component';
 import { TripItemComponent } from './stats/trips/trip-item/trip-item.component';
 import { TripDetailsComponent } from './stats/trips/trip-details/trip-details.component';
+import { SettingsComponent } from './settings/settings.component';
 
 @NgModule({
-  declarations: [AppComponent, DashboardComponent, StatistiquesComponent, TripListComponent, TripItemComponent, TripDetailsComponent],
+  declarations: [AppComponent, DashboardComponent, StatistiquesComponent, TripListComponent, TripItemComponent, TripDetailsComponent, SettingsComponent],
   imports: [BrowserModule, AppRoutingModule],
   providers: [],
   bootstrap: [AppComponent],
