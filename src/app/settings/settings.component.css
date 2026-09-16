@@ -1,24 +1,251 @@
 .conteneur {
-    margin-top: 10%;
-    text-align: center;
-    align-content: center;
+  margin-top: 10%;
+  text-align: center;
+  align-content: center;
+  overflow-y: scroll;
+  user-select: none;
 }
 
-
 span {
-    font-size: smaller;
-    color: grey;
+  font-size: smaller;
+  color: grey;
 }
 
 h3 {
-    margin: 0;
-    margin-top: 20px;
-    margin-bottom: 20px;
-    color: var(--color-text-green);
+  margin: 0;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  color: var(--color-text-green);
+}
+
+.preferences {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  width: 100%;
+}
+
+.preferences > div {
+  flex: 0 0 calc(50% - 5px);
+  box-sizing: border-box;
+}
+
+.switch-option {
+  display: flex;
+  cursor: pointer;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  background-color: rgba(128, 128, 128, 0.373);
+  padding: 5px 8px 5px 8px;
+  border-radius: 15px;
+}
+
+.optionCheck {
+  border: 2px solid var(--color-text-green);
+}
+
+.optionCross {
+  border: 2px solid red;
+}
+
+.switch-option span {
+  color: whitesmoke;
+  text-align: center;
+}
+
+.switch-option input:focus-visible {
+  outline: 2px solid var(--color-text-green);
+  outline-offset: 3px;
+}
+
+.switch-option .logo-background {
+  padding: 5px;
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
+  transition: 0.4s ease;
+}
+
+.switch-option .logo {
+  width: 20px;
+  display: block;
+  height: 20px;
+}
+
+.switch-option .cross {
+  background-color: red;
+  mask: url("/icons/cross.svg") center / contain no-repeat;
+  -webkit-mask: url("/icons/cross.svg") center / contain no-repeat;
+}
+
+.switch-option .check {
+  background-color: var(--color-text-green);
+  mask: url("/icons/check.svg") center / contain no-repeat;
+  -webkit-mask: url("/icons/check.svg") center / contain no-repeat;
+}
+
+.updateBadges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  width: 100%;
+}
+
+.updateBadges > div {
+  flex: 0 0 calc(50% - 5px);
+  box-sizing: border-box;
+}
+
+.updateBadges div {
+  position: relative;
+  align-items: center;
+  background-color: rgba(128, 128, 128, 0.373);
+  padding: 5px 8px 5px 8px;
+  border-radius: 15px;
+}
+
+.updateBadges .actual {
+  border: 2px solid red;
+}
+
+.updateBadges .latest {
+  border: 2px solid var(--color-text-green);
+}
+
+.updateBadges .logo-info-background {
+  position: absolute;
+  top: -0.75em;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5em;
+  height: 1.5em;
+  box-sizing: border-box;
+  z-index: 1;
+  border: 2px solid var(--color-text-green);
+  border-radius: 50%;
+  background-color: black;
+}
+
+.updateBadges .actual .logo-info-background {
+  border: 2px solid red;
+}
+
+.updateBadges .logo-info {
+  width: 1em;
+  height: 1em;
+  display: block;
+  background-color: white;
+  mask: url("/icons/info.svg") center / contain no-repeat;
+  -webkit-mask: url("/icons/info.svg") center / contain no-repeat;
+}
+
+.updateDate {
+  font-size: 0.7em;
+  color: grey;
+  margin-top: 10px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .switch-option .cross,
+  .switch-option .check {
+    animation: none;
+  }
 }
 
 .data {
-    text-align: left;
-    width: fit-content;
-    text-indent: 0.6em;
+  text-align: left;
+  width: fit-content;
+  text-indent: 0.6em;
+}
+
+/* =========================
+   FOND DU PANEL
+   ========================= */
+
+.update-panel {
+  position: fixed;
+  z-index: 1000;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(
+    0,
+    0,
+    0,
+    0.76
+  ); /* Empêche le débordement de créer un scroll */
+  overflow: hidden;
+}
+
+/* =========================
+   CONTENU DU PANEL
+   ========================= */
+
+.update-content {
+  position: relative;
+  width: 80%;
+  max-width: 500px;
+  max-height: 70%;
+  padding: 25px;
+  background-color: rgba(0, 0, 0, 0.95);
+  border: 15px solid rgb(60, 55, 55);
+  border-radius: 15px;
+  text-align: center;
+  box-sizing: border-box; /* Permet à la croix de dépasser */
+  overflow: visible;
+}
+
+/* =========================
+   FERMETURE
+   ========================= */
+
+.update-close {
+  position: absolute; /* * La bordure fait 15px. * On place donc la croix à cheval sur la bordure. */
+  top: -25px;
+  right: -25px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 5px solid rgb(60, 55, 55);
+  background-color: red;
+  color: white;
+  font-size: 28px;
+  line-height: 30px;
+  cursor: pointer;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+/* =========================
+   TEXTES
+   ========================= */
+
+.update-content h3 {
+  margin-top: 5px;
+  margin-bottom: 15px;
+
+  color: var(--color-text-green);
+}
+
+.update-version {
+  color: #aaa;
+  font-size: 0.9em;
+}
+
+.update-description {
+  margin: 20px 0;
+
+  color: white;
+  text-align: left;
+
+  line-height: 1.5;
 }

@@ -75,6 +75,8 @@ export class AppComponent implements OnInit {
   updateVersion = '';
   updateDescription = '';
 
+  public config: any[] | undefined = undefined;
+
   // Propriété publique : elle peut être transmise aux sous-composants via @Input.
   public infoApp: AppInfo | null = null;
 
@@ -120,9 +122,32 @@ export class AppComponent implements OnInit {
     this.showAdvancedMetrics = await this.databaseService.getPreference(
       'advancedMetrics'
     );
-
     this.infoApp = await App.getInfo();
-    this.databaseService.updateConfig('apkVersion', this.infoApp.version);
+    this.config = await this.databaseService.getAllConfig();
+
+    if (
+      this.infoApp.version !=
+        this.config?.find((row) => row.label === 'apkName')?.value &&
+      this.infoApp.version ===
+        this.config?.find((row) => row.label === 'pendingName')?.value
+    ) {
+      this.databaseService.updateConfig(
+        'apkTitle',
+        this.config?.find((row) => row.label === 'pendingTitle')?.value
+      );
+      this.databaseService.updateConfig(
+        'apkName',
+        this.config?.find((row) => row.label === 'pendingName')?.value
+      );
+      this.databaseService.updateConfig(
+        'apkDescription',
+        this.config?.find((row) => row.label === 'pendingDescription')?.value
+      );
+
+      this.databaseService.updateConfig('pendingTitle', '');
+      this.databaseService.updateConfig('pendingName', '');
+      this.databaseService.updateConfig('pendingDescription', '');
+    }
     this.loadRelease();
 
     const permission = await LocalNotifications.requestPermissions();
@@ -211,6 +236,12 @@ export class AppComponent implements OnInit {
     this.isDownloading = true;
 
     try {
+      await this.databaseService.updateConfig('pendingTitle', this.updateTitle);
+      await this.databaseService.updateConfig('pendingName', this.updateName);
+      await this.databaseService.updateConfig(
+        'pendingDescription',
+        this.updateDescription
+      );
       const result = await this.updateService.updateApp();
 
       if (result.success === false) {

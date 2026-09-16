@@ -276,16 +276,6 @@ export class TripService {
       Date.now()
     );
 
-    console.log(
-      'GPS count  ' +
-        this.speedSampleCount +
-        ' || Motion count  ' +
-        this.motionSampleCount +
-        ' || time elapsed  ' +
-        this.currentMetrics.elapsedTime +
-        'ms'
-    );
-
     this.emitMetrics();
   }
 
@@ -350,7 +340,7 @@ export class TripService {
       }
 
       this.emitMetrics();
-    }, 200);
+    }, 100);
   }
 
   /**

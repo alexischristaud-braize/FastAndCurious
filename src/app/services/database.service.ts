@@ -89,10 +89,16 @@ export class DatabaseService {
           ('advancedMetrics', 0)
       `);
 
-       await this.db.run(`
+      await this.db.run(`
         INSERT OR IGNORE INTO config (label, value)
         VALUES
-          ('apkVersion', "0")
+          ('apkTitle', ""),
+          ('apkName', "0"),
+          ('apkDescription', ""),
+          ('pendingTitle', ""),
+          ('pendingName', ""),
+          ('pendingDescription', "")
+          
       `);
       console.log('[DB] Préférences initialisées');
       console.log('[DB] Initialisation terminée');
@@ -428,7 +434,7 @@ export class DatabaseService {
   /**
    * Récupère une config.
    *
-   * @param label Nom de la config à lire.
+   * @param label Nom de la config à lire. possible : apkTitle, apkName, apkDescription, pendingTitle, pendingName, pendingDescription *
    * @returns la valeur stockée qui est un varchar .
    */
   async getConfig(label: string): Promise<string> {
@@ -443,6 +449,23 @@ export class DatabaseService {
     );
 
     return result.values?.[0]?.value;
+  }
+
+  /**
+   * Récupère toute la config.
+   *
+   * @returns la valeur stockée qui est un varchar .
+   */
+  async getAllConfig(): Promise<any[] | undefined> {
+    await this.init();
+    const result = await this.db.query(
+      `
+        SELECT *
+        FROM config
+      `
+    );
+
+    return result?.values;
   }
 
   /**

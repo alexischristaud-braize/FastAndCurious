@@ -28,6 +28,10 @@ export class UpdateService {
   private releaseApiUrl =
     'https://api.github.com/repos/alexischristaud-braize/FastAndCurious/releases/latest';
 
+    /**
+     * 
+     * @returns GithubRelease {tag_name: string;  name: string;  body: string;}
+     */
   async getLatestRelease(): Promise<GithubRelease> {
     console.log("Recherche d'une release");
     const response = await fetch(this.releaseApiUrl);

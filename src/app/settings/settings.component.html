@@ -1,24 +1,145 @@
 <div class="conteneur">
+  <div
+    *ngIf="showUpdatePanelActual || showUpdatePanelLatest"
+    class="update-panel"
+    (click)="closeUpdatePanel(showUpdatePanelActual)"
+  >
+    <div class="update-content" (click)="$event.stopPropagation()">
+      <button
+        class="update-close"
+        type="button"
+        (click)="closeUpdatePanel(showUpdatePanelActual)"
+        aria-label="Fermer"
+      >
+        ×
+      </button>
+
+      <h3>{{ showUpdatePanelActual ? this.actualTitle : this.latestTitle }}</h3>
+
+      <div class="update-info">
+        <p class="update-version">
+          {{ showUpdatePanelActual ? this.actualName : this.latestName }}
+        </p>
+
+        <div
+          class="update-description"
+          [innerHTML]="
+            showUpdatePanelActual
+              ? this.actualDescription
+              : this.latestDescription
+          "
+        ></div>
+      </div>
+    </div>
+  </div>
+
+  <h3>Préférences</h3>
+
+  <div class="preferences">
+    <div
+      class="switch-option"
+      (click)="switchVariable('showUpdate')"
+      [ngClass]="showUpdate ? 'optionCheck' : 'optionCross'"
+    >
+      <span class="logo-background">
+        <span class="logo" [ngClass]="showUpdate ? 'check' : 'cross'"></span>
+      </span>
+      <span>Icône de mise à jour</span>
+    </div>
+
+    <div
+      class="switch-option"
+      (click)="switchVariable('themeSombre')"
+      [ngClass]="themeSombre ? 'optionCheck' : 'optionCross'"
+    >
+      <span class="logo-background">
+        <span class="logo" [ngClass]="themeSombre ? 'check' : 'cross'"></span>
+      </span>
+      <span>Thème sombre</span>
+    </div>
+
+    <div
+      class="switch-option"
+      (click)="switchVariable('test1')"
+      [ngClass]="test1 ? 'optionCheck' : 'optionCross'"
+    >
+      <span class="logo-background">
+        <span class="logo" [ngClass]="test1 ? 'check' : 'cross'"></span>
+      </span>
+      <span>Test1</span>
+    </div>
+
+    <div
+      class="switch-option"
+      (click)="switchVariable('test2')"
+      [ngClass]="test2 ? 'optionCheck' : 'optionCross'"
+    >
+      <span class="logo-background">
+        <span class="logo" [ngClass]="test2 ? 'check' : 'cross'"></span>
+      </span>
+      <span>Test2</span>
+    </div>
+  </div>
+  <br />
+
+  <h3>Version de l'application</h3>
+
+  <div class="updateBadges">
+    <div
+      [ngClass]="
+        this.actualName === this.latestName ? 'latest' : 'actual'
+      "
+      (click)="openUpdatePanel(true)"
+    >
+      <span class="logo-info-background">
+        <span class="logo-info"></span>
+      </span>
+
+      Actuelle : <span>{{ this.actualName || "Inconnue" }}</span>
+    </div>
+    <div class="latest" (click)="openUpdatePanel(false)">
+      <span class="logo-info-background">
+        <span class="logo-info"></span>
+      </span>
+
+      Disponible :
+      <span>{{ this.latestName || "Inconnue" }}</span>
+    </div>
+  </div>
+  <div class="updateDate">
+    Dernière mise à jour locale le <span>Date inconnue</span>
+  </div>
+
+  <br />
+  <br />
+  <br />
+  <br />
+  <br />
+  <br />
+  <br />
+  <br />
+  <br />
+  <br />
   <h3>------------------ App ------------------</h3>
   <div class="data">
-    Name : <span>{{ this.infoApp?.name || "Inconnu" }}</span>
+    Name : <span>{{ this.infoApp?.name || "no data" }}</span>
   </div>
   <div class="data">
-    Version : <span>{{ this.infoApp?.version || "Inconnu" }}</span>
+    Version : <span>{{ this.infoApp?.version || "no data" }}</span>
   </div>
-  <div class="data">Install : <span>Date inconnue</span></div>
-  <div class="data">Last update : <span>Date inconnue</span></div>
-  <h3>---------------- Device ----------------</h3>
 
+  <div class="data">Fisrt install : <span>no data</span></div>
+
+  <h3>---------------- Device ----------------</h3>
   <div class="data">
-    Version :
-    <span>{{ this.infoDevice?.androidSDKVersion || "Inconnu" }} </span>
+    Android SDK Version :
+    <span>{{ this.infoDevice?.androidSDKVersion || "no data" }} </span>
   </div>
   <div class="data">
-    Memory : <span>{{ this.infoDevice?.memUsed || "Inconnu" }} </span>
+    Memory used : <span>{{ this.getconvertToOctet() }} </span>
   </div>
   <div class="data">
     Webview version :
-    <span>{{ this.infoDevice?.webViewVersion || "Inconnu" }} </span>
+    <span>{{ this.infoDevice?.webViewVersion || "no data" }} </span>
   </div>
 </div>
