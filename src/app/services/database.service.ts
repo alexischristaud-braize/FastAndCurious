@@ -89,6 +89,11 @@ export class DatabaseService {
           ('advancedMetrics', 0)
       `);
 
+       await this.db.run(`
+        INSERT OR IGNORE INTO config (label, value)
+        VALUES
+          ('apkVersion', "0")
+      `);
       console.log('[DB] Préférences initialisées');
       console.log('[DB] Initialisation terminée');
     } catch (error) {
@@ -108,6 +113,11 @@ export class DatabaseService {
     // await this.db.execute('DROP TABLE IF EXISTS trips');
 
     const query = `
+      CREATE TABLE IF NOT EXISTS config (
+        label VARCHAR(50) PRIMARY KEY,
+        value VARCHAR(50)
+      );
+
       CREATE TABLE IF NOT EXISTS preferences (
         label VARCHAR(50) PRIMARY KEY,
         value INTEGER DEFAULT 0
@@ -217,7 +227,7 @@ export class DatabaseService {
    * Ajoute une mesure à un trajet.
    *
    * @param tripId Identifiant du trajet auquel rattacher la mesure.
-  * @param metrics Mesures GPS et vitesse à enregistrer.
+   * @param metrics Mesures GPS et vitesse à enregistrer.
    * @returns L'identifiant numérique de la mesure créée.
    */
   async addTripData(tripId: number, metrics: TripMetrics): Promise<number> {
@@ -234,13 +244,7 @@ export class DatabaseService {
         )
         VALUES (?, ?, ?, ?, ?)
       `,
-      [
-        tripId,
-        Date.now(),
-        metrics.speed,
-        metrics.latitude,
-        metrics.longitude,
-      ]
+      [tripId, Date.now(), metrics.speed, metrics.latitude, metrics.longitude]
     );
 
     if (result.changes?.lastId === undefined) {
@@ -258,8 +262,8 @@ export class DatabaseService {
    * @param distance Distance parcourue, en mètres.
    * @param maxSpeed Vitesse maximale enregistrée.
    * @param averageSpeed Vitesse moyenne enregistrée.
-  * @param time50 Temps jusqu'à 50 km/h, en millisecondes.
-  * @param time100 Temps jusqu'à 100 km/h, en millisecondes.
+   * @param time50 Temps jusqu'à 50 km/h, en millisecondes.
+   * @param time100 Temps jusqu'à 100 km/h, en millisecondes.
    * @param endedAt Horodatage Unix en millisecondes de la fin du trajet.
    * @returns Une Promise résolue lorsque la mise à jour est enregistrée.
    */
@@ -390,9 +394,6 @@ export class DatabaseService {
    */
   async getPreference(label: string): Promise<boolean> {
     await this.init();
-
-    console.log('getPref : start');
-
     const result = await this.db.query(
       `
         SELECT value
@@ -401,12 +402,7 @@ export class DatabaseService {
       `,
       [label]
     );
-
-    const toReturn = result.values?.[0]?.value === 1;
-
-    console.log('getPref : ' + toReturn);
-
-    return toReturn;
+    return result.values?.[0]?.value === 1;
   }
 
   /**
@@ -422,6 +418,46 @@ export class DatabaseService {
     await this.db.run(
       `
         UPDATE preferences
+        SET value = ?
+        WHERE label = ?
+      `,
+      [value, label]
+    );
+  }
+
+  /**
+   * Récupère une config.
+   *
+   * @param label Nom de la config à lire.
+   * @returns la valeur stockée qui est un varchar .
+   */
+  async getConfig(label: string): Promise<string> {
+    await this.init();
+    const result = await this.db.query(
+      `
+        SELECT value
+        FROM config
+        WHERE label = ?
+      `,
+      [label]
+    );
+
+    return result.values?.[0]?.value;
+  }
+
+  /**
+   * Modifie une config.
+   *
+   * @param label Nom de la config à modifier.
+   * @param value Valeur varchar à enregistrer.
+   * @returns Une Promise résolue lorsque la préférence est enregistrée.
+   */
+  async updateConfig(label: string, value: string): Promise<void> {
+    await this.init();
+
+    await this.db.run(
+      `
+        UPDATE config
         SET value = ?
         WHERE label = ?
       `,

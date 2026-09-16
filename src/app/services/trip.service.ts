@@ -120,7 +120,7 @@ export class TripService {
         if (speedKmh >= 50 && this.currentMetrics.time50 == 0) {
           this.currentMetrics.time50 = this.currentMetrics.elapsedTimeRace;
           if (
-            this.currentMetrics.bestTime50 < this.currentMetrics.elapsedTimeRace
+            this.currentMetrics.bestTime50 > this.currentMetrics.elapsedTimeRace
           ) {
             this.currentMetrics.bestTime50 =
               this.currentMetrics.elapsedTimeRace;
@@ -131,7 +131,7 @@ export class TripService {
           this.currentMetrics.time100 = this.currentMetrics.elapsedTimeRace;
 
           if (
-            this.currentMetrics.bestTime100 <
+            this.currentMetrics.bestTime100 >
             this.currentMetrics.elapsedTimeRace
           ) {
             this.currentMetrics.bestTime100 =

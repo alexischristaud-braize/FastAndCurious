@@ -4,6 +4,7 @@ import { TripMetrics } from './models/trip-metrics';
 import { TripService } from './services/trip.service';
 import { DatabaseService } from './services/database.service';
 import { LocalNotifications } from '@capacitor/local-notifications';
+import { UpdateService } from './services/update.service';
 
 /**
  * Composant racine de l'application.
@@ -18,7 +19,6 @@ import { LocalNotifications } from '@capacitor/local-notifications';
 export class AppComponent implements OnInit {
   // Contrôle l'affichage des métriques avancées dans le template.
   showAdvancedMetrics = false;
-  dataUpdated = false;
   count = 0;
 
   // État courant des données de trajet affichées dans l'interface.
@@ -60,6 +60,20 @@ export class AppComponent implements OnInit {
     gTotal: 0,
   };
 
+  dataUpdated = false;
+  // =========================
+  // UPDATE
+  // =========================
+  updateAvailable = true;
+  showUpdatePanel = false;
+  isDownloading = false;
+
+  updateTitle = 'Mise à jour disponible !';
+  updateName = '';
+  updateVersion = '';
+  actualVersion = '';
+  updateDescription = '';
+
   /**
    * Construit le composant racine et lance l'initialisation de la base SQLite.
    *
@@ -71,7 +85,8 @@ export class AppComponent implements OnInit {
   constructor(
     private trip: TripService,
     private databaseService: DatabaseService,
-    private db: DatabaseService
+    private db: DatabaseService,
+    private updateService: UpdateService
   ) {
     this.databaseService
       .init()
@@ -96,6 +111,10 @@ export class AppComponent implements OnInit {
     this.showAdvancedMetrics = await this.databaseService.getPreference(
       'advancedMetrics'
     );
+
+    this.actualVersion = await this.databaseService.getConfig('apkVersion');
+    this.loadRelease();
+
     const permission = await LocalNotifications.requestPermissions();
 
     console.log(permission);
@@ -141,9 +160,59 @@ export class AppComponent implements OnInit {
     this.showAdvancedMetrics = !this.showAdvancedMetrics;
     if (this.showAdvancedMetrics) {
       this.db.updatePreference('advancedMetrics', 1);
-      this.dataUpdated = true;
     } else {
       this.db.updatePreference('advancedMetrics', 0);
+    }
+  }
+
+  async loadRelease(): Promise<void> {
+    try {
+      const release = await this.updateService.getLatestRelease();
+
+      this.updateVersion = release.tag_name;
+      this.updateName = release.name;
+
+      this.updateDescription = release.body || 'Aucune description disponible.';
+      if (this.actualVersion != release.tag_name) {
+        this.updateAvailable = true;
+      }
+    } catch (error) {
+      console.error(
+        'Impossible de récupérer les informations de la release',
+        error
+      );
+
+      this.updateAvailable = false;
+    }
+  }
+
+  async openUpdatePanel(): Promise<void> {
+    this.actualVersion = await this.databaseService.getConfig('apkVersion');
+    this.showUpdatePanel = true;
+  }
+
+  closeUpdatePanel(): void {
+    this.showUpdatePanel = false;
+  }
+
+  async downloadUpdate(): Promise<void> {
+    if (this.isDownloading) {
+      return;
+    }
+    this.isDownloading = true;
+    try {
+       await this.updateService.updateApp();
+
+      // L'installation peut être annulée par l'utilisateur sans lever d'erreur.
+
+      // Exécuté uniquement si le téléchargement et l'installation ont réussi.
+      // this.updateAvailable = false;
+      this.showUpdatePanel = false;
+      // this.databaseService.updateConfig('apkVersion', this.updateVersion);
+    } catch (error) {
+      console.error("Impossible d'installer la mise à jour", error);
+    } finally {
+      this.isDownloading = false;
     }
   }
 }

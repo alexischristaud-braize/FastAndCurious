@@ -1,41 +1,101 @@
 <div class="page">
+  <!-- Bouton de mise à jour -->
+  <button
+    *ngIf="updateAvailable"
+    class="div-download"
+    type="button"
+    (click)="openUpdatePanel()"
+    aria-label="Mise à jour disponible"
+  >
+    <span class="icon icon-download" aria-hidden="true"></span>
+  </button>
+
+  <div class="settings" routerLink="/settings">
+    <span class="icon icon-settings" aria-hidden="true"></span>
+  </div>
+
+  <!-- PANEL DE MISE À JOUR -->
+  <div
+    *ngIf="showUpdatePanel"
+    class="update-panel"
+    (click)="closeUpdatePanel()"
+  >
+    <div class="update-content" (click)="$event.stopPropagation()">
+      <button
+        class="update-close"
+        type="button"
+        (click)="closeUpdatePanel()"
+        aria-label="Fermer"
+      >
+        ×
+      </button>
+
+      <h3>{{ this.updateTitle }}</h3>
+
+      <div class="update-info">
+        <p class="update-version">
+          {{ this.updateName }}
+          <br />
+          Actuel : {{ this.actualVersion }}
+        </p>
+
+        <div class="update-description" [innerHTML]="updateDescription"></div>
+      </div>
+
+      <button
+        *ngIf="!isDownloading"
+        class="update-button"
+        type="button"
+        (click)="downloadUpdate()"
+      >
+        METTRE À JOUR
+      </button>
+
+      <div *ngIf="isDownloading" class="update-loading">
+        Téléchargement en cours...
+      </div>
+    </div>
+  </div>
 
   <!-- HEADER -->
   <header class="header">
     <span class="logo-fast">FAST</span>
     <span class="logo-and">&</span>
     <span class="logo-curious">CURIOUS</span>
-    <span *ngIf="dataUpdated" class="logo-curious" style="color: grey">save</span>
+
+    <span *ngIf="dataUpdated" class="logo-curious" style="color: grey">
+      save
+    </span>
   </header>
 
   <router-outlet></router-outlet>
-
 </div>
 
-
 <!-- FOOTER -->
-
 <footer>
-
-  <button class="nav-button" routerLink="dashboard" routerLinkActive="active" type="button">
-
+  <button
+    class="nav-button"
+    routerLink="dashboard"
+    routerLinkActive="active"
+    type="button"
+  >
     <span>
       <span class="icon icon-car" aria-hidden="true"></span>
     </span>
 
     CONDUIRE
-
   </button>
 
-  <button class="nav-button" routerLink="statistiques" routerLinkActive="active" type="button">
-
+  <button
+    class="nav-button"
+    routerLink="statistiques"
+    routerLinkActive="active"
+    type="button"
+  >
     <span>
       <span class="icon icon-stat" aria-hidden="true"></span>
-
     </span>
 
     STATISTIQUES
-
   </button>
-
 </footer>

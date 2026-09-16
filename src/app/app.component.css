@@ -12,7 +12,6 @@
   overflow: hidden;
 }
 
-
 /* =================================
    PAGE PRINCIPALE
 ================================= */
@@ -30,7 +29,6 @@
 
   overflow: hidden;
 }
-
 
 /* =================================
    HEADER
@@ -112,32 +110,237 @@ footer {
   height: 20px;
   display: block;
   background-color: currentColor;
-  mask: url('/icons/steering.svg') center / contain no-repeat;
-  -webkit-mask: url('/icons/steering.svg') center / contain no-repeat;
+  mask: url("/icons/steering.svg") center / contain no-repeat;
+  -webkit-mask: url("/icons/steering.svg") center / contain no-repeat;
 }
-
 
 .icon-stat {
   width: 20px;
   height: 20px;
   display: block;
   background-color: currentColor;
-  mask: url('/icons/stats.svg') center / contain no-repeat;
-  -webkit-mask: url('/icons/stats.svg') center / contain no-repeat;
+  mask: url("/icons/stats.svg") center / contain no-repeat;
+  -webkit-mask: url("/icons/stats.svg") center / contain no-repeat;
+}
+
+/* =========================
+   BOUTON DE MISE À JOUR
+   ========================= */
+
+.div-download {
+  border: none;
+  background-color:transparent;
+  border-radius: 50%;
+  padding: 5px;
+  position: absolute;
+  margin-top: 50px;
+  margin-right: 10px;
+  right: 0;
+  height: 40px;
+  width: 40px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+
+  transition: 0.4s ease-in-out;
+}
+
+.div-download:hover {
+  transform: scale(1.1);
+  background-color: rgba(101, 156, 19, 0.458);
+  border-color: #4bf88a;
+}
+
+.icon-download {
+  width: 40px;
+  height: 40px;
+  display: block;
+
+  background-color: rgb(255, 0, 0);
+  animation: download-icon-pulse 5s ease-in-out infinite;
+
+  mask: url("/icons/download.svg") center / contain no-repeat;
+  -webkit-mask: url("/icons/download.svg") center / contain no-repeat;
+}
+
+@keyframes download-icon-pulse {
+  0%,
+  100% {
+    background-color: grey;
+  }
+
+  80% {
+    background-color: var(--color-text-green);
+  }
 }
 
 
-.nav-button.active {
+.settings {
+  padding: 5px;
+  position: absolute;
+  margin-top: 15px;
+  margin-right: 10px;
+  right: 0;
+  height: 40px;
+  width: 40px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+
+  transition: 0.4s ease-in-out;
+}
+
+.icon-settings {
+  width: 40px;
+  height: 40px;
+  display: block;
+
+  background-color: grey;
+
+  mask: url("/icons/settings.svg") center / contain no-repeat;
+  -webkit-mask: url("/icons/settings.svg") center / contain no-repeat;
+}
+
+/* =========================
+   FOND DU PANEL
+   ========================= */
+
+.update-panel {
+  position: fixed;
+  z-index: 1000;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(
+    0,
+    0,
+    0,
+    0.76
+  ); /* Empêche le débordement de créer un scroll */
+  overflow: hidden;
+}
+
+/* =========================
+   CONTENU DU PANEL
+   ========================= */
+
+.update-content {
+  position: relative;
+  width: 80%;
+  max-width: 500px;
+  max-height: 70%;
+  padding: 25px;
+  background-color: rgba(0, 0, 0, 0.95);
+  border: 15px solid rgb(60, 55, 55);
+  border-radius: 15px;
+  text-align: center;
+  box-sizing: border-box; /* Permet à la croix de dépasser */
+  overflow: visible;
+}
+
+/* =========================
+   FERMETURE
+   ========================= */
+
+.update-close {
+  position: absolute; /* * La bordure fait 15px. * On place donc la croix à cheval sur la bordure. */
+  top: -25px;
+  right: -25px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 5px solid rgb(60, 55, 55);
+  background-color: red;
+  color: white;
+  font-size: 28px;
+  line-height: 30px;
+  cursor: pointer;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+/* =========================
+   TEXTES
+   ========================= */
+
+.update-content h3 {
+  margin-top: 5px;
+  margin-bottom: 15px;
+
   color: var(--color-text-green);
 }
 
+.update-version {
+  color: #aaa;
+  font-size: 0.9em;
+}
+
+.update-description {
+  margin: 20px 0;
+
+  color: white;
+  text-align: left;
+
+  line-height: 1.5;
+}
+
+/* =========================
+   BOUTON
+   ========================= */
+
+.update-button {
+  padding: 12px 25px;
+
+  border: 2px solid var(--color-text-green);
+  border-radius: 8px;
+
+  background-color: rgba(70, 99, 27, 0.458);
+
+  color: var(--color-text-green);
+
+  font-weight: bold;
+
+  cursor: pointer;
+
+  transition: 0.3s;
+}
+
+.update-button:hover {
+  background-color: rgba(101, 156, 19, 0.458);
+  transform: scale(1.05);
+}
+
+/* =========================
+   TÉLÉCHARGEMENT
+   ========================= */
+
+.update-loading {
+  margin-top: 15px;
+
+  color: var(--color-text-green);
+}
+.nav-button.active {
+  color: var(--color-text-green);
+}
 
 /* =================================
    PETITS ÉCRANS EN HAUTEUR
 ================================= */
 
 @media (max-height: 600px) {
-
   .page {
     padding-top: 6px;
     padding-bottom: 4px;
@@ -152,5 +355,4 @@ footer {
   footer {
     flex-basis: 50px;
   }
-
 }
