@@ -49,7 +49,7 @@ export class UpdateService {
     const result = await ApkInstaller.install({
       uri: apkUri,
     });
-    console.log( "update service update app : " + result);
+    console.log( "update service update app : " +result);
   }
 
   private blobToBase64(blob: Blob): Promise<string> {

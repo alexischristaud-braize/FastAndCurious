@@ -1,16 +1,19 @@
 package com.fastandcurious.app;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.Settings;
 
+import androidx.activity.result.ActivityResult;
 import androidx.core.content.FileProvider;
 
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
+import com.getcapacitor.annotation.ActivityCallback;
 import com.getcapacitor.annotation.CapacitorPlugin;
 
 import java.io.File;
@@ -135,10 +138,23 @@ public class ApkInstallerPlugin extends Plugin {
             "application/vnd.android.package-archive"
         );
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        // Pas de FLAG_ACTIVITY_NEW_TASK : incompatible avec startActivityForResult
 
-        getActivity().startActivity(intent);
+        startActivityForResult(call, intent, "installResultCallback");
+    }
 
-        call.resolve();
+    @ActivityCallback
+    private void installResultCallback(PluginCall call, ActivityResult result) {
+        if (call == null) {
+            return;
+        }
+
+        JSObject ret = new JSObject();
+        boolean success = result.getResultCode() == Activity.RESULT_OK;
+
+        ret.put("success", success);
+        ret.put("resultCode", result.getResultCode());
+
+        call.resolve(ret);
     }
 }
