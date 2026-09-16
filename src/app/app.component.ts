@@ -1,4 +1,4 @@
-import { App } from '@capacitor/app';
+import { App, AppInfo } from '@capacitor/app';
 import { Component, OnInit } from '@angular/core';
 
 import { TripMetrics } from './models/trip-metrics';
@@ -6,6 +6,7 @@ import { TripService } from './services/trip.service';
 import { DatabaseService } from './services/database.service';
 import { LocalNotifications } from '@capacitor/local-notifications';
 import { UpdateService } from './services/update.service';
+import { Router, RouterLink } from '@angular/router';
 
 /**
  * Composant racine de l'application.
@@ -65,16 +66,19 @@ export class AppComponent implements OnInit {
   // =========================
   // UPDATE
   // =========================
-  updateAvailable = true;
+  updateAvailable = false;
   showUpdatePanel = false;
   isDownloading = false;
 
   updateTitle = 'Mise à jour disponible !';
   updateName = '';
   updateVersion = '';
-  actualVersionApp = '';
-  actualVersion = '';
   updateDescription = '';
+
+  // Propriété publique : elle peut être transmise aux sous-composants via @Input.
+  public infoApp: AppInfo | null = null;
+
+  public router: Router;
 
   /**
    * Construit le composant racine et lance l'initialisation de la base SQLite.
@@ -88,8 +92,11 @@ export class AppComponent implements OnInit {
     private trip: TripService,
     private databaseService: DatabaseService,
     private db: DatabaseService,
-    private updateService: UpdateService
+    private updateService: UpdateService,
+    private routerService: Router
   ) {
+    this.router = routerService;
+
     this.databaseService
       .init()
       .then(() => {
@@ -114,8 +121,8 @@ export class AppComponent implements OnInit {
       'advancedMetrics'
     );
 
-    this.actualVersion = await this.databaseService.getConfig('apkVersion');
-    this.actualVersionApp = (await App.getInfo())?.version;
+    this.infoApp = await App.getInfo();
+    this.databaseService.updateConfig('apkVersion', this.infoApp.version);
     this.loadRelease();
 
     const permission = await LocalNotifications.requestPermissions();
@@ -176,7 +183,7 @@ export class AppComponent implements OnInit {
       this.updateName = release.name;
 
       this.updateDescription = release.body || 'Aucune description disponible.';
-      if (this.actualVersion != release.tag_name) {
+      if (this.infoApp?.version != release.tag_name) {
         this.updateAvailable = true;
       }
     } catch (error) {
@@ -190,7 +197,6 @@ export class AppComponent implements OnInit {
   }
 
   async openUpdatePanel(): Promise<void> {
-    this.actualVersion = await this.databaseService.getConfig('apkVersion');
     this.showUpdatePanel = true;
   }
 
@@ -211,10 +217,6 @@ export class AppComponent implements OnInit {
         console.log("Installation annulée par l'utilisateur");
         return;
       }
-
-      this.updateAvailable = false;
-      this.showUpdatePanel = false;
-      this.databaseService.updateConfig('apkVersion', this.updateVersion);
     } catch (error) {
       console.error("Impossible d'installer la mise à jour", error);
     } finally {

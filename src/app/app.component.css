@@ -1,6 +1,24 @@
 /* =================================
    COMPOSANT RACINE
 ================================= */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+:host ::ng-deep router-outlet + * {
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    filter: blur(1px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
 
 :host {
   display: flex;
@@ -181,7 +199,7 @@ footer {
 .settings {
   padding: 5px;
   position: absolute;
-  margin-top: 15px;
+  padding-top: 27px;
   margin-right: 10px;
   right: 0;
   height: 40px;
@@ -195,6 +213,16 @@ footer {
 
   transition: 0.4s ease-in-out;
 }
+
+
+.settings.active .icon-settings  {
+  background-color: red;
+  
+  mask: url("/icons/cross.svg") center / contain no-repeat;
+  -webkit-mask: url("/icons/cross.svg") center / contain no-repeat;
+}
+
+
 
 .icon-settings {
   width: 40px;

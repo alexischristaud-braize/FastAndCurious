@@ -1,1 +1,24 @@
-<p>settings works!</p>
+<div class="conteneur">
+  <h3>------------------ App ------------------</h3>
+  <div class="data">
+    Name : <span>{{ this.infoApp?.name || "Inconnu" }}</span>
+  </div>
+  <div class="data">
+    Version : <span>{{ this.infoApp?.version || "Inconnu" }}</span>
+  </div>
+  <div class="data">Install : <span>Date inconnue</span></div>
+  <div class="data">Last update : <span>Date inconnue</span></div>
+  <h3>---------------- Device ----------------</h3>
+
+  <div class="data">
+    Version :
+    <span>{{ this.infoDevice?.androidSDKVersion || "Inconnu" }} </span>
+  </div>
+  <div class="data">
+    Memory : <span>{{ this.infoDevice?.memUsed || "Inconnu" }} </span>
+  </div>
+  <div class="data">
+    Webview version :
+    <span>{{ this.infoDevice?.webViewVersion || "Inconnu" }} </span>
+  </div>
+</div>

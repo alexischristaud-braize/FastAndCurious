@@ -1,4 +1,12 @@
 <div class="page">
+  <div
+    class="settings"
+    [routerLink]="router.url === '/settings' ? 'dashboard' : 'settings'"
+    [ngClass]="{ 'active': router.url === '/settings' }"
+  >
+    <span class="icon icon-settings" aria-hidden="true"></span>
+  </div>
+
   <!-- Bouton de mise à jour -->
   <button
     *ngIf="updateAvailable"
@@ -9,11 +17,6 @@
   >
     <span class="icon icon-download" aria-hidden="true"></span>
   </button>
-
-  <div class="settings" routerLink="settings">
-    <span class="icon icon-settings" aria-hidden="true"></span>
-  </div>
-
   <!-- PANEL DE MISE À JOUR -->
   <div
     *ngIf="showUpdatePanel"
@@ -36,7 +39,7 @@
         <p class="update-version">
           {{ this.updateName }}
           <br />
-          {{ this.actualVersion }} | {{ this.actualVersionApp }}
+          actuel: {{ this.infoApp?.version }}
         </p>
 
         <div class="update-description" [innerHTML]="updateDescription"></div>
