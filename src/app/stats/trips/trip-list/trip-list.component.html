@@ -1,1 +1,21 @@
-<p>trip-list works!</p>
+<div class="table-trips">
+  <div class="trip-row" *ngFor="let trip of trips">
+    <div style="width: 100%">
+      <span class="elapsedTime"
+        >Durée : <span class="light">{{ formatDuration(trip.elapsedTime) }}</span>
+      </span>
+
+      <span class="time" [ngClass]="trip.endedAt === 0 || trip.endedAt === null ? 'processing' : ''">
+        {{ timeElapsed(trip.endedAt) }}
+      </span>
+
+      <div class="div-stats">
+        <div class="trip-stat"><span class="stats-titles">Distance : </span>{{ trip.distance | number : '1.1-1' }} km</div>
+        <div class="trip-stat"><span class="stats-titles">Vitesse max : </span>{{ trip.maxSpeed | number : '1.1-1' }} km/h</div>
+      </div>
+    </div>
+    <div class="info">
+      <span></span>
+    </div>
+  </div>
+</div>

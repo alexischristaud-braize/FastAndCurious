@@ -6,7 +6,7 @@ import { TripService } from './services/trip.service';
 import { DatabaseService } from './services/database.service';
 import { LocalNotifications } from '@capacitor/local-notifications';
 import { UpdateService } from './services/update.service';
-import { Router, RouterLink } from '@angular/router';
+import { NavigationEnd, Router, RouterLink } from '@angular/router';
 
 /**
  * Composant racine de l'application.
@@ -21,6 +21,7 @@ import { Router, RouterLink } from '@angular/router';
 export class AppComponent implements OnInit {
   // Contrôle l'affichage des métriques avancées dans le template.
   showAdvancedMetrics = false;
+  showUpdate = false;
   count = 0;
 
   // État courant des données de trajet affichées dans l'interface.
@@ -75,7 +76,7 @@ export class AppComponent implements OnInit {
   updateVersion = '';
   updateDescription = '';
 
-  public config: any[] | undefined = undefined;
+  public config: Record<string, any> = {};
 
   // Propriété publique : elle peut être transmise aux sous-composants via @Input.
   public infoApp: AppInfo | null = null;
@@ -90,13 +91,7 @@ export class AppComponent implements OnInit {
    * @param db Référence au service utilisée pour enregistrer les préférences d'affichage.
    * @returns Rien. Le constructeur prépare uniquement l'état initial du composant.
    */
-  constructor(
-    private trip: TripService,
-    private databaseService: DatabaseService,
-    private db: DatabaseService,
-    private updateService: UpdateService,
-    private routerService: Router
-  ) {
+  constructor(private trip: TripService, private databaseService: DatabaseService, private db: DatabaseService, private updateService: UpdateService, private routerService: Router) {
     this.router = routerService;
 
     this.databaseService
@@ -116,43 +111,47 @@ export class AppComponent implements OnInit {
    * @returns Une Promise résolue après le chargement de la préférence d'affichage avancé.
    */
   async ngOnInit(): Promise<void> {
+    this.router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        void this.actualiserVariables();
+      }
+    });
+
     this.trip.metrics$.subscribe((metrics) => {
       this.metrics = metrics;
     });
-    this.showAdvancedMetrics = await this.databaseService.getPreference(
-      'advancedMetrics'
-    );
-    this.infoApp = await App.getInfo();
-    this.config = await this.databaseService.getAllConfig();
 
-    if (
-      this.infoApp.version !=
-        this.config?.find((row) => row.label === 'apkName')?.value &&
-      this.infoApp.version ===
-        this.config?.find((row) => row.label === 'pendingName')?.value
-    ) {
-      this.databaseService.updateConfig(
-        'apkTitle',
-        this.config?.find((row) => row.label === 'pendingTitle')?.value
-      );
-      this.databaseService.updateConfig(
-        'apkName',
-        this.config?.find((row) => row.label === 'pendingName')?.value
-      );
-      this.databaseService.updateConfig(
-        'apkDescription',
-        this.config?.find((row) => row.label === 'pendingDescription')?.value
-      );
+    this.showAdvancedMetrics = await this.databaseService.getPreference('advancedMetrics');
+    this.showUpdate = await this.databaseService.getPreference('showUpdate');
+    this.infoApp = await App.getInfo();
+    const configRows = await this.databaseService.getAllConfig();
+    this.config = configRows?.reduce((config, row) => {
+      config[row.label] = row.value;
+      return config;
+    }, {} as Record<string, any>);
+
+    if (this.infoApp.version != this.config['apkVersion']) {
+      await this.databaseService.updateConfig('apkTitle', this.config['pendingTitle']);
+      await this.databaseService.updateConfig('apkVersion', this.config['pendingVersion']);
+      await this.databaseService.updateConfig('apkDescription', this.config['pendingDescription']);
+      await this.databaseService.updateConfig('lastUpdate', this.config['pendingDate']);
 
       this.databaseService.updateConfig('pendingTitle', '');
-      this.databaseService.updateConfig('pendingName', '');
+      this.databaseService.updateConfig('pendingVersion', '');
       this.databaseService.updateConfig('pendingDescription', '');
+      this.databaseService.updateConfig('pendingDate', '');
     }
     this.loadRelease();
 
     const permission = await LocalNotifications.requestPermissions();
 
     console.log(permission);
+  }
+
+  /** Actualise les variables après chaque changement de page. */
+  private async actualiserVariables(): Promise<void> {
+    this.showAdvancedMetrics = await this.databaseService.getPreference('advancedMetrics');
+    this.showUpdate = await this.databaseService.getPreference('showUpdate');
   }
 
   /**
@@ -206,17 +205,13 @@ export class AppComponent implements OnInit {
 
       this.updateVersion = release.tag_name;
       this.updateName = release.name;
-
       this.updateDescription = release.body || 'Aucune description disponible.';
+
       if (this.infoApp?.version != release.tag_name) {
         this.updateAvailable = true;
       }
     } catch (error) {
-      console.error(
-        'Impossible de récupérer les informations de la release',
-        error
-      );
-
+      console.error('Impossible de récupérer les informations de la release', error);
       this.updateAvailable = false;
     }
   }
@@ -236,12 +231,13 @@ export class AppComponent implements OnInit {
     this.isDownloading = true;
 
     try {
-      await this.databaseService.updateConfig('pendingTitle', this.updateTitle);
-      await this.databaseService.updateConfig('pendingName', this.updateName);
-      await this.databaseService.updateConfig(
-        'pendingDescription',
-        this.updateDescription
-      );
+      console.log('downloadUpdate');
+      await this.databaseService.updateConfig('pendingTitle', this.updateName);
+      await this.databaseService.updateConfig('pendingVersion', this.updateVersion);
+      await this.databaseService.updateConfig('pendingDescription', this.updateDescription);
+
+      await this.databaseService.updateConfig('pendingDate', Date.now().toString());
+
       const result = await this.updateService.updateApp();
 
       if (result.success === false) {

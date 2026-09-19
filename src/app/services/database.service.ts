@@ -86,18 +86,22 @@ export class DatabaseService {
         INSERT OR IGNORE INTO preferences (label, value)
         VALUES
           ('themeSombre', 0),
-          ('advancedMetrics', 0)
+          ('advancedMetrics', 0),
+          ('showUpdate', 0)
       `);
 
       await this.db.run(`
         INSERT OR IGNORE INTO config (label, value)
         VALUES
           ('apkTitle', ""),
-          ('apkName', "0"),
+          ('apkVersion', "0"),
+          
           ('apkDescription', ""),
+          ('lastUpdate', ""),
           ('pendingTitle', ""),
-          ('pendingName', ""),
-          ('pendingDescription', "")
+          ('pendingVersion', ""),
+          ('pendingDescription', ""),
+          ('pendingDate', "")
           
       `);
       console.log('[DB] Préférences initialisées');
@@ -395,7 +399,7 @@ export class DatabaseService {
   /**
    * Récupère une préférence.
    *
-   * @param label Nom de la préférence à lire.
+   * @param label Nom de la préférence à lire. themeSombre, advancedMetric, showUpdate
    * @returns `true` si la valeur stockée vaut 1, sinon `false`.
    */
   async getPreference(label: string): Promise<boolean> {
@@ -434,7 +438,7 @@ export class DatabaseService {
   /**
    * Récupère une config.
    *
-   * @param label Nom de la config à lire. possible : apkTitle, apkName, apkDescription, pendingTitle, pendingName, pendingDescription *
+   * @param label Nom de la config à lire. possible : apkTitle, apkVersion, apkDescription, lastUpdate, pendingTitle, pendingVersion, pendingDescription, pendingDate
    * @returns la valeur stockée qui est un varchar .
    */
   async getConfig(label: string): Promise<string> {
@@ -454,7 +458,7 @@ export class DatabaseService {
   /**
    * Récupère toute la config.
    *
-   * @returns la valeur stockée qui est un varchar .
+   * @returns un tableau any[] composer de apkTitle, apkVersion, apkDescription, lastUpdate, pendingTitle, pendingVersion, pendingDescription, pendingDate
    */
   async getAllConfig(): Promise<any[] | undefined> {
     await this.init();
@@ -471,7 +475,7 @@ export class DatabaseService {
   /**
    * Modifie une config.
    *
-   * @param label Nom de la config à modifier.
+   * @param label apkTitle, apkVersion, apkDescription, lastUpdate, pendingTitle, pendingVersion, pendingDescription, pendingDate
    * @param value Valeur varchar à enregistrer.
    * @returns Une Promise résolue lorsque la préférence est enregistrée.
    */

@@ -16,9 +16,7 @@ import { DatabaseService } from './database.service';
 })
 export class TripService {
   // Flux principal des métriques du trajet. Il permet à l'UI de se synchroniser automatiquement.
-  private metricsSubject = new BehaviorSubject<TripMetrics>(
-    this.createInitialMetrics()
-  );
+  private metricsSubject = new BehaviorSubject<TripMetrics>(this.createInitialMetrics());
 
   metrics$ = this.metricsSubject.asObservable();
 
@@ -46,7 +44,8 @@ export class TripService {
   private startTime = 0;
   private startRace = 0;
 
-  private isRacing = true;
+  private reach0 = false;
+  private isRacing = false;
 
   // Dernière position connue pour calculer la distance parcourue entre deux points.
   private previousLatitude: number | null = null;
@@ -63,11 +62,7 @@ export class TripService {
    * @param motion Service qui fournit les mesures d'accélération et d'orientation.
    * @returns Rien. Les abonnements aux capteurs sont installés pendant la construction.
    */
-  constructor(
-    private gps: GpsService,
-    private motion: MotionService,
-    private DB: DatabaseService
-  ) {
+  constructor(private gps: GpsService, private motion: MotionService, private DB: DatabaseService) {
     this.DB.init()
       .then(() => {
         console.log('Base de données prête');
@@ -102,40 +97,35 @@ export class TripService {
         gpsCount: this.speedSampleCount,
       };
 
-      if (speedKmh > 1 && !this.isRacing) {
+      if (speedKmh < 1) {
+        this.isRacing = false;
+        this.reach0 = true;
+        this.currentMetrics = {
+          ...this.currentMetrics,
+          elapsedTimeRace: 0,
+          time50: 0,
+          time100: 0,
+        };
+      }
+
+      if (speedKmh > 1 && this.reach0 && !this.isRacing) {
         this.isRacing = true;
         this.startRace = Date.now();
       }
+      
       if (this.isRacing) {
-        if (speedKmh < 1) {
-          this.isRacing = false;
-          this.currentMetrics = {
-            ...this.currentMetrics,
-            elapsedTimeRace: 0,
-            time50: 0,
-            time100: 0,
-          };
-        }
-
         if (speedKmh >= 50 && this.currentMetrics.time50 == 0) {
           this.currentMetrics.time50 = this.currentMetrics.elapsedTimeRace;
-          if (
-            this.currentMetrics.bestTime50 > this.currentMetrics.elapsedTimeRace
-          ) {
-            this.currentMetrics.bestTime50 =
-              this.currentMetrics.elapsedTimeRace;
+          if (this.currentMetrics.bestTime50 > this.currentMetrics.time50 || this.currentMetrics.bestTime50 === 0) {
+            this.currentMetrics.bestTime50 = this.currentMetrics.time50;
           }
         }
 
         if (speedKmh >= 100 && this.currentMetrics.time100 == 0) {
           this.currentMetrics.time100 = this.currentMetrics.elapsedTimeRace;
 
-          if (
-            this.currentMetrics.bestTime100 >
-            this.currentMetrics.elapsedTimeRace
-          ) {
-            this.currentMetrics.bestTime100 =
-              this.currentMetrics.elapsedTimeRace;
+          if (this.currentMetrics.bestTime100 > this.currentMetrics.time100 || this.currentMetrics.bestTime100 === 0) {
+            this.currentMetrics.bestTime100 = this.currentMetrics.time100;
           }
           this.isRacing = false;
         }
@@ -151,12 +141,7 @@ export class TripService {
       let additionalDistance = 0;
 
       if (this.previousLatitude !== null && this.previousLongitude !== null) {
-        additionalDistance = this.calculateDistance(
-          this.previousLatitude,
-          this.previousLongitude,
-          latitude,
-          longitude
-        );
+        additionalDistance = this.calculateDistance(this.previousLatitude, this.previousLongitude, latitude, longitude);
       }
 
       // La position actuelle devient la référence pour le prochain calcul.
@@ -165,11 +150,9 @@ export class TripService {
 
       const distance = this.currentMetrics.distance + additionalDistance;
       this.currentMetrics.distance = distance;
-      void this.DB.addTripData(this.tripId, this.currentMetrics).catch(
-        (error) => {
-          console.error('[DB] Erreur insertion données trajet :', error);
-        }
-      );
+      void this.DB.addTripData(this.tripId, this.currentMetrics).catch((error) => {
+        console.error('[DB] Erreur insertion données trajet :', error);
+      });
       this.emitMetrics();
     });
 
@@ -265,16 +248,7 @@ export class TripService {
       speed: 0,
     };
 
-    await this.DB.updateTrip(
-      this.tripId,
-      this.currentMetrics.elapsedTime,
-      this.currentMetrics.distance,
-      this.currentMetrics.maxSpeed,
-      this.currentMetrics.averageSpeed,
-      this.currentMetrics.bestTime50,
-      this.currentMetrics.bestTime100,
-      Date.now()
-    );
+    await this.DB.updateTrip(this.tripId, this.currentMetrics.elapsedTime, this.currentMetrics.distance, this.currentMetrics.maxSpeed, this.currentMetrics.averageSpeed, this.currentMetrics.bestTime50, this.currentMetrics.bestTime100, Date.now());
 
     this.emitMetrics();
   }
@@ -455,12 +429,7 @@ export class TripService {
    * @param longitude2 Longitude du second point, en degrés.
    * @returns La distance entre les deux points, en mètres.
    */
-  private calculateDistance(
-    latitude1: number,
-    longitude1: number,
-    latitude2: number,
-    longitude2: number
-  ): number {
+  private calculateDistance(latitude1: number, longitude1: number, latitude2: number, longitude2: number): number {
     const earthRadius = 6371000;
 
     const lat1 = this.degreesToRadians(latitude1);
@@ -468,12 +437,7 @@ export class TripService {
     const deltaLatitude = this.degreesToRadians(latitude2 - latitude1);
     const deltaLongitude = this.degreesToRadians(longitude2 - longitude1);
 
-    const a =
-      Math.sin(deltaLatitude / 2) * Math.sin(deltaLatitude / 2) +
-      Math.cos(lat1) *
-        Math.cos(lat2) *
-        Math.sin(deltaLongitude / 2) *
-        Math.sin(deltaLongitude / 2);
+    const a = Math.sin(deltaLatitude / 2) * Math.sin(deltaLatitude / 2) + Math.cos(lat1) * Math.cos(lat2) * Math.sin(deltaLongitude / 2) * Math.sin(deltaLongitude / 2);
 
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 

@@ -1,0 +1,85 @@
+.table-trips {
+  width: 100%;
+  font-size: 0.8em;
+  border: var(--color-border) 3px solid;
+  border-radius: 30px;
+}
+
+.table-trips::-webkit-scrollbar {
+  width: 8px;
+}
+
+.table-trips::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.table-trips::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 30px;
+}
+
+.trip-row {
+  display: flex;
+  padding: 5px 0px 5px 10px;
+  border: 1px solid var(--color-border);
+  background: var(--color-card);
+  margin: 10px;
+  border-radius: 15px;
+  align-items: center;
+}
+
+.time {
+  font-size: 1em;
+  font-weight: 900;
+  float: right;
+}
+
+.processing {
+  color: var(--color-text-green);
+  border-radius: 7px;
+}
+
+.elapsedTime {
+  font-size: 1em;
+  font-weight: 900;
+}
+
+.div-stats {
+  display: flex;
+  color: var(--color-text-secondary);
+  border-top: grey 1px solid;
+  gap: 20px;
+  font-size: 0.8em;
+  font-weight: 600;
+  margin-top: 5px;
+  padding-top: 3px;
+}
+.trip-stat {
+  padding: 2px 0px 2px 0px;
+  text-align: center;
+  border-radius: 7px;
+  width: 100%;
+}
+
+.light {
+  color: var(--color-text-secondary);
+}
+
+.info {
+  display: flex;
+  align-items: center;
+  border: 2px solid var(--color-text-secondary);
+  border-radius: 50%;
+  margin-left: 8px;
+  margin-right: 8px;
+  width: 20px;
+  height: 20px;
+}
+
+.info span {
+  width: 20px;
+  height: 20px;
+  background-color: var(--color-text-secondary);
+  mask: url('/icons/info.svg') center / contain no-repeat;
+  -webkit-mask: url('/icons/info.svg') center / contain no-repeat;
+}

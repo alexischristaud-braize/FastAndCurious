@@ -62,10 +62,7 @@ export class DashboardComponent {
    * @param db Référence au service utilisée pour enregistrer les préférences d'affichage.
    * @returns Rien. Le constructeur prépare uniquement l'état initial du composant.
    */
-  constructor(
-    private trip: TripService,
-    private databaseService: DatabaseService
-  ) {
+  constructor(private trip: TripService, private databaseService: DatabaseService) {
     this.databaseService
       .init()
       .then(() => {
@@ -86,9 +83,7 @@ export class DashboardComponent {
     this.trip.metrics$.subscribe((metrics) => {
       this.metrics = metrics;
     });
-    this.showAdvancedMetrics = await this.databaseService.getPreference(
-      'advancedMetrics'
-    );
+    this.showAdvancedMetrics = await this.databaseService.getPreference('advancedMetrics');
   }
 
   /**

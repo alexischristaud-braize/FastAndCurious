@@ -18,7 +18,7 @@
 
       <div class="update-info">
         <p class="update-version">
-          {{ showUpdatePanelActual ? this.actualName : this.latestName }}
+          {{ showUpdatePanelActual ? this.actualVersion : this.latestVersion }}
         </p>
 
         <div
@@ -44,7 +44,7 @@
       <span class="logo-background">
         <span class="logo" [ngClass]="showUpdate ? 'check' : 'cross'"></span>
       </span>
-      <span>Icône de mise à jour</span>
+      <span>Notif MAJ</span>
     </div>
 
     <div
@@ -87,7 +87,7 @@
   <div class="updateBadges">
     <div
       [ngClass]="
-        this.actualName === this.latestName ? 'latest' : 'actual'
+        this.actualVersion === this.latestVersion ? 'latest' : 'actual'
       "
       (click)="openUpdatePanel(true)"
     >
@@ -95,7 +95,7 @@
         <span class="logo-info"></span>
       </span>
 
-      Actuelle : <span>{{ this.actualName || "Inconnue" }}</span>
+      Actuelle : <span>{{ this.actualVersion || "Inconnue" }}</span>
     </div>
     <div class="latest" (click)="openUpdatePanel(false)">
       <span class="logo-info-background">
@@ -103,7 +103,7 @@
       </span>
 
       Disponible :
-      <span>{{ this.latestName || "Inconnue" }}</span>
+      <span>{{ this.latestVersion || "Inconnue" }}</span>
     </div>
   </div>
   <div class="updateDate">

@@ -20,13 +20,13 @@ export class SettingsComponent implements OnInit {
   public showUpdatePanelActual: boolean = false;
   public showUpdatePanelLatest: boolean = false;
 
-  actualTitle: string = 'actualTitle';
-  actualName: string = 'actualName';
-  actualDescription: string = 'actualDescription';
+  actualTitle: string = '';
+  actualVersion: string = '';
+  actualDescription: string = '';
 
-  latestTitle: string = 'latestTitle';
-  latestName: string = 'latestName';
-  latestDescription: string = 'latestDescription';
+  latestTitle: string = '';
+  latestVersion: string = '';
+  latestDescription: string = '';
 
   /**
    * Construit le composant racine et lance l'initialisation de la base SQLite.
@@ -36,10 +36,7 @@ export class SettingsComponent implements OnInit {
    * @param db Référence au service utilisée pour enregistrer les préférences d'affichage.
    * @returns Rien. Le constructeur prépare uniquement l'état initial du composant.
    */
-  constructor(
-    private databaseService: DatabaseService,
-    private updateService: UpdateService
-  ) {
+  constructor(private databaseService: DatabaseService, private updateService: UpdateService) {
     this.databaseService
       .init()
       .then(() => {
@@ -55,15 +52,16 @@ export class SettingsComponent implements OnInit {
     this.infoApp = await App.getInfo();
 
     this.actualTitle = await this.databaseService.getConfig('apkTitle');
-    this.actualName = await this.databaseService.getConfig('apkVersion');
-    this.actualDescription = await this.databaseService.getConfig(
-      'apkDescription'
-    );
+    this.actualVersion = await this.databaseService.getConfig('apkVersion');
+    this.actualDescription = await this.databaseService.getConfig('apkDescription');
+
+    this.showUpdate = await this.databaseService.getPreference('showUpdate');
+    this.themeSombre = await this.databaseService.getPreference('themeSombre');
 
     const latestRelease = await this.updateService.getLatestRelease();
     this.latestTitle = latestRelease.name;
-    this.latestName = latestRelease.tag_name;
-    this.actualDescription = latestRelease.body;
+    this.latestVersion = latestRelease.tag_name;
+    this.latestDescription = latestRelease.body;
   }
 
   public getconvertToOctet(): string {
@@ -75,24 +73,24 @@ export class SettingsComponent implements OnInit {
           result = result / 1024; // Mega
           if (result >= 1024) {
             result = result / 1024; // Giga
-            return result + 'GBs';
+            return result.toFixed(2) + 'GBs';
           }
-          return result + 'MBs';
+          return result.toFixed(2) + 'MBs';
         }
-        return result + 'KBs';
+        return result.toFixed(2) + 'KBs';
       }
-      return result + 'Bs';
+      return result.toFixed(2) + 'Bs';
     }
     return 'no data';
   }
 
-  public switchVariable<T extends keyof SettingsComponent>(
-    switchVariable: T
-  ): void {
+  public async switchVariable<T extends keyof SettingsComponent>(switchVariable: T): Promise<void> {
     const value = this[switchVariable];
 
     if (typeof value === 'boolean') {
-      (this as Record<T, boolean>)[switchVariable] = !value;
+      const newValue = !value;
+      (this as Record<T, boolean>)[switchVariable] = newValue;
+      await this.databaseService.updatePreference(String(switchVariable), newValue ? 1 : 0);
     }
   }
 
@@ -101,9 +99,7 @@ export class SettingsComponent implements OnInit {
    * @param actual il s'agit du panneau de version actuel
    */
   async openUpdatePanel(actual: boolean): Promise<void> {
-    actual
-      ? (this.showUpdatePanelActual = true)
-      : (this.showUpdatePanelLatest = true);
+    actual ? (this.showUpdatePanelActual = true) : (this.showUpdatePanelLatest = true);
   }
 
   /**
@@ -111,8 +107,6 @@ export class SettingsComponent implements OnInit {
    * @param actual il s'agit du panneau de version actuel
    */
   closeUpdatePanel(actual: boolean): void {
-    actual
-      ? (this.showUpdatePanelActual = false)
-      : (this.showUpdatePanelLatest = false);
+    actual ? (this.showUpdatePanelActual = false) : (this.showUpdatePanelLatest = false);
   }
 }

@@ -1,20 +1,16 @@
-/* =================================
-   DASHBOARD
-================================= */
-
-:host {
-  display: flex;
-  flex: 1 1 0;
-  flex-direction: column;
-
-  width: 100%;
-  min-width: 0;
-  min-height: 0;
+main {
+  overflow-y: scroll;
 }
 
-/* =================================
-   COMPTEUR PRINCIPAL
-================================= */
+
+.recap {
+  max-height: 40%;
+}
+
+.historique {
+  max-height: 60%;
+}
+
 
 .entete {
   font-weight: 900;
@@ -28,61 +24,6 @@
   padding: 0;
   font-weight: 900;
   letter-spacing: 2px;
-}
-
-.select-wrapper {
-  position: relative;
-  display: inline-block;
-  vertical-align: middle;
-}
-
-.select-measure {
-  display: block;
-  min-width: 0;
-  padding-right: 25px;
-  white-space: nowrap;
-  visibility: hidden;
-}
-
-.select-wrapper::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  right: 1.5em;
-  width: 7px;
-  height: 7px;
-  border-right: 2px solid var(--color-text-green);
-  border-bottom: 2px solid var(--color-text-green);
-  transform: translateY(-65%) rotate(45deg);
-  pointer-events: none;
-}
-
-.periode-select {
-  position: absolute;
-  inset: 0;
-  width: 80%;
-  appearance: none;
-  border: none;
-  background: transparent;
-  color: var(--color-text);
-  font: inherit;
-  font-size: 0.85rem;
-  font-weight: 700;
-  text-align: left;
-  cursor: pointer;
-}
-
-.periode-select:focus,
-.periode-select:focus-visible {
-  border: none;
-  outline: none;
-  box-shadow: none;
-}
-
-
-.periode-select option {
-  background: var(--color-card);
-  color: var(--color-text);
 }
 
 .speed-value {

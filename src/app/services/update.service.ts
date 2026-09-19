@@ -53,6 +53,7 @@ export class UpdateService {
   }
 
   async updateApp(): Promise<InstallResult> {
+    console.log('updateAPP');
     const apkUri = await this.downloadApk();
 
     const result = await ApkInstaller.install({ uri: apkUri });

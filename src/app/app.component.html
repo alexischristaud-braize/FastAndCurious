@@ -2,14 +2,14 @@
   <div
     class="settings"
     [routerLink]="router.url === '/settings' ? 'dashboard' : 'settings'"
-    [ngClass]="{ 'active': router.url === '/settings' }"
+    [ngClass]="{ active: router.url === '/settings' }"
   >
     <span class="icon icon-settings" aria-hidden="true"></span>
   </div>
 
   <!-- Bouton de mise à jour -->
   <button
-    *ngIf="updateAvailable"
+    *ngIf="updateAvailable && showUpdate"
     class="div-download"
     type="button"
     (click)="openUpdatePanel()"
